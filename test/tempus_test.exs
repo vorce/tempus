@@ -43,7 +43,8 @@ defmodule TempusTest do
                 shift_amount <- StreamData.positive_integer(),
                 now <- date_time_generator(),
                 max_runs: 1000 do
-        {:ok, now_with_tz} = DateTime.shift_zone(now, time_zone, Tzdata.TimeZoneDatabase) |> unambiguate()
+        {:ok, now_with_tz} =
+          DateTime.shift_zone(now, time_zone, Tzdata.TimeZoneDatabase) |> unambiguate()
 
         {:ok, shifted} = Tempus.shift(now_with_tz, [{shift_unit, shift_amount}])
 
@@ -57,7 +58,8 @@ defmodule TempusTest do
                 shift_amount <- StreamData.integer(-1000..-1),
                 now <- date_time_generator(),
                 max_runs: 1000 do
-        {:ok, now_with_tz} = DateTime.shift_zone(now, time_zone, Tzdata.TimeZoneDatabase) |> unambiguate()
+        {:ok, now_with_tz} =
+          DateTime.shift_zone(now, time_zone, Tzdata.TimeZoneDatabase) |> unambiguate()
 
         {:ok, shifted} = Tempus.shift(now_with_tz, [{shift_unit, shift_amount}])
 

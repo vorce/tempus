@@ -6,27 +6,37 @@ defmodule Tempus do
   @doc """
   `shift` allows you to move a date forward or backwards by some units.
   """
-  @spec shift(datetime :: DateTime.t(), opts :: [{:months | :days, integer}], resolver_fn :: Function.t()) :: {:ok, DateTime.t()} | {:error, :invalid_date}
+  @spec shift(
+          datetime :: DateTime.t(),
+          opts :: [{:months | :days, integer}],
+          resolver_fn :: Function.t()
+        ) :: {:ok, DateTime.t()} | {:error, :invalid_date}
   def shift(datetime, shift_opts, resolver_fn \\ &default_resolver/1)
 
   def shift(datetime, [days: n], resolver_fn) do
-    erl_date =
+    shifted_erl_date =
       datetime
       |> DateTime.to_date()
       |> Date.to_erl()
+      |> :calendar.date_to_gregorian_days()
+      |> Kernel.+(n)
+      |> :calendar.gregorian_days_to_date()
 
-    shifted_erl_date =
-      :calendar.gregorian_days_to_date(:calendar.date_to_gregorian_days(erl_date) + n)
+    erl_time =
+      datetime
+      |> DateTime.to_time()
+      |> Time.to_erl()
 
-    utc_erl_time = DateTime.to_time(datetime) |> Time.to_erl()
-    with {:ok, naive} <- NaiveDateTime.from_erl({shifted_erl_date, utc_erl_time}),
+    with {:ok, naive} <- NaiveDateTime.from_erl({shifted_erl_date, erl_time}),
          {:ok, shifted} <- DateTime.from_naive(naive, datetime.time_zone, Tzdata.TimeZoneDatabase) do
       {:ok, shifted}
     else
       {:ambiguous, _, _} = amb ->
         {:ok, resolver_fn.(amb)}
+
       {:gap, _, _} = gap ->
         {:ok, resolver_fn.(gap)}
+
       other ->
         other
     end
@@ -37,8 +47,12 @@ defmodule Tempus do
   end
 
   def shift({:ok, datetime}, opts, resolver_fn), do: shift(datetime, opts, resolver_fn)
-  def shift({:ambiguous, _, _} = amb, opts, resolver_fn), do: amb |> resolver_fn.() |> shift(opts, resolver_fn)
-  def shift({:gap, _, _} = gap, opts, resolver_fn), do: gap |> resolver_fn.() |> shift(opts, resolver_fn)
+
+  def shift({:ambiguous, _, _} = amb, opts, resolver_fn),
+    do: amb |> resolver_fn.() |> shift(opts, resolver_fn)
+
+  def shift({:gap, _, _} = gap, opts, resolver_fn),
+    do: gap |> resolver_fn.() |> shift(opts, resolver_fn)
 
   def shift(datetime, [months: -1], resolver_fn) do
     shift(datetime, [days: -datetime.day], resolver_fn)
@@ -50,7 +64,8 @@ defmodule Tempus do
     shift(datetime, [days: remaining_days_in_month + 1], resolver_fn)
   end
 
-  def shift({:ok, datetime}, [months: n], resolver_fn) when n < 1, do: shift(datetime, [months: n], resolver_fn)
+  def shift({:ok, datetime}, [months: n], resolver_fn) when n < 1,
+    do: shift(datetime, [months: n], resolver_fn)
 
   def shift(datetime, [months: n], resolver_fn) when n < 1 do
     datetime
@@ -58,7 +73,8 @@ defmodule Tempus do
     |> shift([months: n + 1], resolver_fn)
   end
 
-  def shift({:ok, datetime}, [months: n], resolver_fn) when n > 1, do: shift(datetime, [months: n], resolver_fn)
+  def shift({:ok, datetime}, [months: n], resolver_fn) when n > 1,
+    do: shift(datetime, [months: n], resolver_fn)
 
   def shift(datetime, [months: n], resolver_fn) when n > 1 do
     datetime
