@@ -1,6 +1,16 @@
 # Tempus
 
-Time and date experiments
+Time and date experiments.
+
+## Goals
+
+- Gain better understanding of how `DateTime`, `Date`, `Time` work and how they can be manipulated (together with time zones)
+- Approach datetime manipulation from a "property based testing first" mindset to ensure correctness
+- Provide some convenience functions that can be handy for Elixir developers
+
+## Available functions
+
+- `shift/3`, `shift/4` - return a new date "shifted" x days or months (backward or forward).
 
 ## Installation
 

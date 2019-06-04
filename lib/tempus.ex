@@ -5,6 +5,9 @@ defmodule Tempus do
 
   @doc """
   `shift` allows you to move a date forward or backwards by some units.
+
+  The `resolver_fn` is optional, but can be supplied to resolve ambiguous dates (or gaps) in a custom way.
+  The default `resolver_fn` will always pick the second datetime for ambiguous and gap datetimes. See: https://hexdocs.pm/elixir/DateTime.html#from_naive/3
   """
   @spec shift(
           datetime :: DateTime.t(),
