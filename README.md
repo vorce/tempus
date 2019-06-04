@@ -1,6 +1,6 @@
 # Tempus
 
-**TODO: Add description**
+Time and date experiments
 
 ## Installation
 
