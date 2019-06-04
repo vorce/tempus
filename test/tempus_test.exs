@@ -4,6 +4,28 @@ defmodule TempusTest do
   doctest Tempus
 
   describe "shift" do
+    test "negative days" do
+      date = DateTime.from_naive!(~N[2019-04-30T21:30:00], "Etc/UTC")
+      time_zone = "Europe/Helsinki"
+      {:ok, date_with_timezone} = DateTime.shift_zone(date, time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date_with_timezone, days: -32)
+
+      assert DateTime.to_iso8601(shifted_date) == "2019-03-30T00:30:00+02:00"
+      assert shifted_date.time_zone == time_zone
+    end
+
+    test "negative months" do
+      date = DateTime.from_naive!(~N[2019-04-30T21:30:00], "Etc/UTC")
+      time_zone = "Europe/Helsinki"
+      {:ok, date_with_timezone} = DateTime.shift_zone(date, time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date_with_timezone, months: -6)
+
+      assert DateTime.to_iso8601(shifted_date) == "2018-11-30T00:30:00+02:00"
+      assert shifted_date.time_zone == time_zone
+    end
+
     test "helsinki 1 month" do
       date = DateTime.from_naive!(~N[2019-04-30T21:30:00], "Etc/UTC")
       time_zone = "Europe/Helsinki"
@@ -15,7 +37,7 @@ defmodule TempusTest do
       assert shifted_date.time_zone == time_zone
     end
 
-    property "is always in the future" do
+    property "positive shift amount results in a datetime in the future" do
       check all shift_unit <- StreamData.member_of([:days, :months]),
                 time_zone <- time_zone_generator(),
                 shift_amount <- StreamData.positive_integer(),
@@ -26,6 +48,20 @@ defmodule TempusTest do
         {:ok, shifted} = Tempus.shift(now_with_tz, [{shift_unit, shift_amount}])
 
         assert DateTime.compare(shifted, now_with_tz) == :gt
+      end
+    end
+
+    property "negative shift amount results in a datetime in the past" do
+      check all shift_unit <- StreamData.member_of([:days, :months]),
+                time_zone <- time_zone_generator(),
+                shift_amount <- StreamData.integer(-1000..-1),
+                now <- date_time_generator(),
+                max_runs: 1000 do
+        {:ok, now_with_tz} = DateTime.shift_zone(now, time_zone, Tzdata.TimeZoneDatabase) |> unambiguate()
+
+        {:ok, shifted} = Tempus.shift(now_with_tz, [{shift_unit, shift_amount}])
+
+        assert DateTime.compare(shifted, now_with_tz) == :lt
       end
     end
   end
