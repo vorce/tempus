@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/vorce/tempus.svg?style=svg)](https://circleci.com/gh/vorce/tempus)
+
 # Tempus
 
 Time and date experiments.
