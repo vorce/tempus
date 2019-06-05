@@ -56,6 +56,17 @@ defmodule Tempus.ShiftTest do
       assert DateTime.to_iso8601(shifted_date) == "2019-03-30T00:30:00+02:00"
       assert shifted_date.time_zone == time_zone
     end
+
+    test "going exactly to DST" do
+      date = DateTime.from_naive!(~N[2019-05-10 00:00:00], "Etc/UTC")
+      time_zone = "Europe/Warsaw"
+      {:ok, date_with_timezone} = DateTime.shift_zone(date, time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date_with_timezone, days: -40)
+      {:ok, shifted_utc} = DateTime.shift_zone(shifted_date, "Etc/UTC", Tzdata.TimeZoneDatabase)
+
+      assert DateTime.to_iso8601(shifted_utc) == "2019-03-31T01:00:00Z"
+    end
   end
 
   describe "months" do
@@ -103,6 +114,21 @@ defmodule Tempus.ShiftTest do
 
       assert DateTime.to_iso8601(shifted_date) == "2019-04-29T23:30:00+02:00"
       assert shifted_date.time_zone == time_zone
+    end
+
+    test "with resolved ambiguity" do
+      time_zone = "America/New_York"
+      {:ok, date_with_timezone} = DateTime.from_naive(~N[2018-11-04T00:30:00], time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date_with_timezone, hours: 1)
+      # 2018-11-04 01:30:00 America/New_York is ambiguous
+      # ie it can be either of:
+      # 2018-11-04 01:30:00-04:00 EDT America/New_York
+      # 2018-11-04 01:30:00-05:00 EST America/New_York
+      # The default resolver_fn always takes the second datetime when this happens.
+
+      assert shifted_date.time_zone == time_zone
+      assert DateTime.to_iso8601(shifted_date) == "2018-11-04T01:30:00-05:00"
     end
   end
 
