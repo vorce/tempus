@@ -10,7 +10,7 @@ Time and date experiments.
 
 ## Available functions
 
-- `shift/3`, `shift/4` - return a new date "shifted" x days or months (backward or forward).
+- `shift/2`, `shift/3` - return a new date "shifted" x days or months (backward or forward).
 
 ## Installation
 
