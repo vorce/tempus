@@ -11,6 +11,7 @@ jobs:
     steps:
       - checkout
       - run: mix local.hex --force
+      - run: mix local.rebar --force
       - run: mix deps.get
       - run: make test
       - restore_cache:
