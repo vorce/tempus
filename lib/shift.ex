@@ -23,9 +23,13 @@ defmodule Tempus.Shift do
   The default `resolver_fn` will always pick the second datetime for ambiguous and gap datetimes. See: https://hexdocs.pm/elixir/DateTime.html#from_naive/3
   """
   @spec shift(
-          datetime :: DateTime.t(),
-          opts :: [{shift_units, integer}],
-          resolver_fn :: Function.t()
+          datetime ::
+            DateTime.t()
+            | {:ok, DateTime.t()}
+            | {:ambiguous, DateTime.t(), DateTime.t()}
+            | {:gap, DateTime.t(), DateTime.t()},
+          opts :: [{shift_units, integer()}],
+          resolver_fn :: function()
         ) :: {:ok, DateTime.t()} | {:error, :invalid_date}
   def shift(datetime, shift_opts, resolver_fn \\ &default_resolver/1)
 

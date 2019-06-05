@@ -1,0 +1,23 @@
+# Elixir CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.8
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: mix local.hex --force
+      - run: mix deps.get
+      - run: make test
+      - restore_cache:
+          key: v1-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
+      - run: make dialyzer
+      - save_cache:
+          key: v1-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
+          paths:
+            - priv/plts
+
