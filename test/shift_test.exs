@@ -46,6 +46,58 @@ defmodule Tempus.ShiftTest do
   end
 
   describe "days" do
+    test "adding 1 day while crossing a DST boundary should not affect time (BST -> GMT)" do
+      time_zone = "Europe/London"
+      date = DateTime.from_naive!(~N[2012-10-28T00:00:00], time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: 1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2012-10-29T00:00:00+00:00"
+      assert shifted_date.time_zone == time_zone
+    end
+
+    test "adding 1 day while crossing a DST boundary should not affect time (PDT -> PST)" do
+      time_zone = "America/Los_Angeles"
+      date = DateTime.from_naive!(~N[2013-11-03T00:00:00], time_zone, Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: 1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2013-11-04T00:00:00-08:00"
+      assert shifted_date.time_zone == time_zone
+    end
+
+    test "adding 1 day while crossing a DST boundary should not affect time (PST -> PDT)" do
+      date = DateTime.from_naive!(~N[2014-03-09T00:00:00], "America/Los_Angeles", Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: 1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2014-03-10T00:00:00-07:00"
+    end
+
+    test "subtracting 1 day while crossing a DST boundary should not affect time (GMT -> BST)" do
+      date = DateTime.from_naive!(~N[2012-10-29T00:00:00], "Europe/London", Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: -1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2012-10-28T00:00:00+01:00"
+    end
+
+    test "subtracting 1 day while crossing a DST boundary should not affect time (PST -> PDT)" do
+      date = DateTime.from_naive!(~N[2013-11-04T00:00:00], "America/Los_Angeles", Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: -1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2013-11-03T00:00:00-07:00"
+    end
+
+    test "subtracting 1 day while crossing a DST boundary should not affect time (PDT -> PST)" do
+      date = DateTime.from_naive!(~N[2014-03-10T00:00:00], "America/Los_Angeles", Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, days: -1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2014-03-09T00:00:00-08:00"
+    end
+
     test "negative" do
       date = DateTime.from_naive!(~N[2019-04-30T21:30:00], "Etc/UTC")
       time_zone = "Europe/Helsinki"
@@ -70,6 +122,14 @@ defmodule Tempus.ShiftTest do
   end
 
   describe "months" do
+    test "adding 1 month while crossing a DST boundary should not affect time (PST -> PDT)" do
+      date = DateTime.from_naive!(~N[2014-03-09T00:00:00], "America/Los_Angeles", Tzdata.TimeZoneDatabase)
+
+      {:ok, shifted_date} = Tempus.shift(date, months: 1)
+
+      assert DateTime.to_iso8601(shifted_date) == "2014-04-09T00:00:00-07:00"
+    end
+
     test "negative" do
       date = DateTime.from_naive!(~N[2019-04-30T21:30:00], "Etc/UTC")
       time_zone = "Europe/Helsinki"

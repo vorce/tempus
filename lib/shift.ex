@@ -130,7 +130,7 @@ defmodule Tempus.Shift do
   def shift(datetime, [months: 1], resolver_fn) do
     days_in_month = Calendar.ISO.days_in_month(datetime.year, datetime.month)
     remaining_days_in_month = days_in_month - datetime.day
-    shift(datetime, [days: remaining_days_in_month + 1], resolver_fn)
+    shift(datetime, [days: remaining_days_in_month + datetime.day], resolver_fn)
   end
 
   def shift({:ok, datetime}, [months: n], resolver_fn) when n < 1,
