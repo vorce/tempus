@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/vorce/tempus.svg?style=svg)](https://circleci.com/gh/vorce/tempus)
+[![CircleCI](https://circleci.com/gh/vorce/tempus.svg?style=svg)](https://circleci.com/gh/vorce/tempus) [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=vorce/tempus)](https://dependabot.com)
 
 # Tempus
 
