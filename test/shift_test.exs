@@ -217,10 +217,6 @@ defmodule Tempus.ShiftTest do
     StreamData.member_of(Tzdata.zone_list())
   end
 
-  defp shift_unit_generator() do
-    StreamData.member_of(Tempus.Shift.units())
-  end
-
   defp shift_unit_generator(:coarse) do
     Tempus.Shift.units()
     |> Enum.reject(fn unit -> unit == :microseconds or unit == :milliseconds end)

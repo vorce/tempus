@@ -8,6 +8,7 @@ defmodule Tempus.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      elixirc_options: [warnings_as_errors: true],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
       ]
