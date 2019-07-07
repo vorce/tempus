@@ -15,10 +15,10 @@ jobs:
       - run: mix deps.get
       - run: make test
       - restore_cache:
-          key: v1-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
+          key: v2-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
       - run: make dialyzer
       - save_cache:
-          key: v1-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
+          key: v2-tempus-dialyzer-cache-{{ checksum "mix.lock" }}
           paths:
             - priv/plts
 
