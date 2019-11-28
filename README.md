@@ -4,6 +4,8 @@
 
 Time and date experiments.
 
+#### I have no plans to continue with this project
+
 ## Goals
 
 - Gain better understanding of how `DateTime`, `Date`, `Time` work and how they can be manipulated (together with time zones)
