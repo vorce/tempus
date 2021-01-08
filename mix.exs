@@ -23,7 +23,7 @@ defmodule Tempus.MixProject do
 
   defp deps do
     [
-      {:tzdata, "~> 1.0.0"},
+      {:tzdata, "~> 1.1.0"},
       {:stream_data, "~> 0.4", only: :test},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
     ]
